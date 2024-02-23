@@ -4,7 +4,9 @@ import com.example.sem6ex2.model.Book;
 import com.example.sem6ex2.model.Reader;
 import com.example.sem6ex2.repository.BookRepository;
 import com.example.sem6ex2.repository.ReaderRepository;
+import com.example.sem6ex2.service.FileGateway;
 import lombok.AllArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -15,12 +17,16 @@ import java.util.Optional;
 @AllArgsConstructor
 @RequestMapping("/book")
 public class BookController {
+    private final FileGateway fileGateway;
     private final BookRepository bookRepository;
     private final ReaderRepository readerRepository;
 
     @PostMapping
-    public Book createBook(@RequestBody Book book) {
-        return bookRepository.save(book);
+    public ResponseEntity<Book> createBook(@RequestBody Book book) {
+        fileGateway.writeToFile(book.getTitle() + ".txt", book.toString());
+        bookRepository.save(book);
+
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @GetMapping
